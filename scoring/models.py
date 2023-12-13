@@ -103,9 +103,12 @@ class Firearm(models.Model):
     """
     
     model = models.CharField(max_length=128, unique=True)
-    manufacturer = models.CharField(max_length=128)
+    make = models.CharField(max_length=128)
     type = models.ForeignKey(FirearmType, on_delete=models.PROTECT)
     caliber = models.CharField(max_length=64, blank=True)
+    sight_type = models.CharField(max_length=64, blank=True, null=True)
+    barrel_length = models.IntegerField(blank=True, null=True)
+    suppressed = models.BooleanField(blank=True, null=True)
 
     class Meta:
         db_table = 'firearm'
