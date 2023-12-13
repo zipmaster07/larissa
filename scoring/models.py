@@ -4,7 +4,7 @@ Classes:
     Drill -- Stores details about the drill.
     FirearmType -- A list of different firearm types.
     Firearm -- Details about a firearm.
-    History -- Stores the overall history.
+    Event -- Stores the overall event history.
     Score -- Stores each drill attempt and its score.
     Skill - A list of shooting skills.
     Shooter -- Details about an individual.
@@ -102,8 +102,8 @@ class Firearm(models.Model):
     to perform the drill.
     """
     
-    model = models.CharField(max_length=128, unique=True)
     make = models.CharField(max_length=128)
+    model = models.CharField(max_length=128, unique=True)
     type = models.ForeignKey(FirearmType, on_delete=models.PROTECT)
     caliber = models.CharField(max_length=64, blank=True)
     sight_type = models.CharField(max_length=64, blank=True, null=True)
@@ -132,11 +132,12 @@ class Drill(models.Model):
     """
 
     name = models.CharField(max_length=64, unique=True)
-    description = models.TextField()
-    targets = models.ManyToManyField(TargetType)
     skills = models.ManyToManyField(Skill)
-    scoring_description = models.TextField()
+    targets = models.ManyToManyField(TargetType)
+    scored = models.BooleanField(blank=True, null=True)
     notes = models.TextField(blank=True)
+    description = models.TextField()
+    scoring_description = models.TextField()
 
     class Meta:
         db_table = 'drill'
@@ -276,7 +277,7 @@ class Score(models.Model):
     string = models.ForeignKey(String, on_delete=models.PROTECT)
     shooter = models.ForeignKey(Shooter, on_delete=models.PROTECT)
     firearm = models.ForeignKey(Firearm, on_delete=models.PROTECT)
-    event_date = models.DateField(default=date.today)
+    event = models.ForeignKey(Event, on_delete=models.PROTECT)
     score_time = models.PositiveIntegerField(blank=True, null=True)
     generic_hits = models.PositiveIntegerField(blank=True, null=True)
     zone_hits_1 = models.PositiveIntegerField(blank=True, null=True)
@@ -303,20 +304,37 @@ class Score(models.Model):
     def __str__(self):
         return str(self.id)
 
-class History(models.Model):
+class Event(models.Model):
     """A history of shooting events.
 
     Stores the date of each shooting event and the drills that were performed
-    at that event.
+    at that event. Temperature should be reported in Fahrenheit.
     """
 
+    STATES = {
+        'CA': 'California',
+        'CO': 'Colorado',
+        'NV': 'Nevada',
+        'UT': 'Utah'
+    }
+
+    RANGE_TYPES = {
+        0: 'Indoor',
+        1: 'Outdoor',
+        2: 'Hybrid'
+    }
+
     event_date = models.DateField(default=date.today)
-    drill = models.ForeignKey(Drill, on_delete=models.PROTECT)
-    count = models.PositiveIntegerField(default=1)
-    location = models.CharField(max_length=255)
+    city = models.CharField(max_length=128, blank=True, null=True)
+    state = models.CharField(max_length=2, choices=STATES, blank=True, null=True)
+    zipcode = models.CharField(max_length=5, blank=True, null=True)
+    range_type = models.SmallIntegerField(choices=RANGE_TYPES, default=1)
+    temperature = models.SmallIntegerField(blank=True, null=True)
+    target_direction = models.CharField(max_length=16, blank=True, null=True)
+
 
     class Meta:
-        db_table = 'history'
+        db_table = 'event'
         constraints = [
             models.UniqueConstraint(
                 fields=['event_date', 'drill'], name='unique_drill_event_date'
@@ -324,4 +342,5 @@ class History(models.Model):
         ]
 
     def __str__(self):
-        return f'{self.event_date}: {self.drill.name}'
+        return f'{self.event_date}' 
+    
