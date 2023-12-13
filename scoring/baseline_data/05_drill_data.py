@@ -178,7 +178,7 @@ bill_drill.targets.add(
     TargetType.objects.get(name='IDPA', version='P (paper)')
 )
 bill_drill.skills.add(
-    Skill.objects.get(name='drawstroke'),
+    Skill.objects.get(name='draw stroke'),
     Skill.objects.get(name='sight picture'),
     Skill.objects.get(name='trigger control'),
     Skill.objects.get(name='recoil management')
@@ -201,7 +201,7 @@ casino.targets.add(
     TargetType.objects.get(name='DT-2C')
 )
 casino.skills.add(
-    Skill.objects.get(name='drawstroke'), Skill.objects.get(name='accuracy'),
+    Skill.objects.get(name='draw stroke'), Skill.objects.get(name='accuracy'),
     Skill.objects.get(name='emergency reloads')
 )
 
@@ -233,7 +233,7 @@ el_presidente.targets.add(
     TargetType.objects.get(name='IDPA', version='P (paper)')
 )
 el_presidente.skills.add(
-    Skill.objects.get(name='accuracy'), Skill.objects.get(name='drawstroke'),
+    Skill.objects.get(name='accuracy'), Skill.objects.get(name='draw stroke'),
     Skill.objects.get(name='sight alignment'),
     Skill.objects.get(name='trigger control'),
     Skill.objects.get(name='target transition'),
@@ -257,7 +257,7 @@ first_shot.targets.add(
     TargetType.objects.get(name='B-8', version='T (heavy paper)')
 )
 first_shot.skills.add(
-    Skill.objects.get(name='drawstroke'),
+    Skill.objects.get(name='draw stroke'),
     Skill.objects.get(name='sight alignment')
 )
 
@@ -329,7 +329,7 @@ wizard.targets.add(
     TargetType.objects.get(name='IDPA', version='P (paper)')
 )
 wizard.skills.add(
-    Skill.objects.get(name='drawstroke'),
+    Skill.objects.get(name='draw stroke'),
     Skill.objects.get(name='trigger control')
 )
 

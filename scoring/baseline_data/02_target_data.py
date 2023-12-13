@@ -2110,7 +2110,7 @@ targets = [
     },
     {
         'name': 'TQ-15',
-        'description': None,
+        'description': '',
         'version': '',
         'color': 0,
         'target_url_1': 'https://www.nationaltarget.com/product/tq-15/',
