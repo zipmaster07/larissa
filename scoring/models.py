@@ -239,7 +239,7 @@ class StringDistance(models.Model):
         db_table = 'drill_string_distance'
         constraints = [
             models.UniqueConstraint(
-                fields=['string', 'starting_distance', 'distance_type'],
+                fields=['string', 'start_distance', 'distance_type'],
                 name='unique_string_distance'
             )
         ]
@@ -267,14 +267,46 @@ class Shooter(models.Model):
     class Meta:
         db_table = 'shooter'
 
-        contstraints = [
+        constraints = [
             models.CheckConstraint(
-                check=Q(strong_hand='Left' | Q(strong_hand='Right'))
+                check=(Q(strong_hand='Left') | Q(strong_hand='Right')),
+                name='check_strong_hand'
             )
         ]
 
     def __str__(self):
         return f'{self.first_name} {self.last_name}' if self.last_name else f'{self.first_name}'
+
+class Event(models.Model):
+    """A history of shooting events.
+
+    Stores the date of each shooting event and the drills that were performed
+    at that event. Temperature should be reported in Fahrenheit.
+    """
+
+    STATES = {
+        'CA': 'California',
+        'CO': 'Colorado',
+        'NV': 'Nevada',
+        'UT': 'Utah'
+    }
+
+    RANGE_TYPES = {
+        0: 'Indoor',
+        1: 'Outdoor',
+        2: 'Hybrid'
+    }
+
+    event_date = models.DateField(default=date.today)
+    city = models.CharField(max_length=128, blank=True, null=True)
+    state = models.CharField(max_length=2, choices=STATES, blank=True, null=True)
+    zipcode = models.CharField(max_length=5, blank=True, null=True)
+    range_type = models.SmallIntegerField(choices=RANGE_TYPES, default=1)
+    temperature = models.SmallIntegerField(blank=True, null=True)
+    target_direction = models.CharField(max_length=16, blank=True, null=True)
+
+    def __str__(self):
+        return f'{self.event_date}' 
 
 class Score(models.Model):
     """Stores each attempt of a drill.
@@ -326,44 +358,4 @@ class Score(models.Model):
 
     def __str__(self):
         return str(self.id)
-
-class Event(models.Model):
-    """A history of shooting events.
-
-    Stores the date of each shooting event and the drills that were performed
-    at that event. Temperature should be reported in Fahrenheit.
-    """
-
-    STATES = {
-        'CA': 'California',
-        'CO': 'Colorado',
-        'NV': 'Nevada',
-        'UT': 'Utah'
-    }
-
-    RANGE_TYPES = {
-        0: 'Indoor',
-        1: 'Outdoor',
-        2: 'Hybrid'
-    }
-
-    event_date = models.DateField(default=date.today)
-    city = models.CharField(max_length=128, blank=True, null=True)
-    state = models.CharField(max_length=2, choices=STATES, blank=True, null=True)
-    zipcode = models.CharField(max_length=5, blank=True, null=True)
-    range_type = models.SmallIntegerField(choices=RANGE_TYPES, default=1)
-    temperature = models.SmallIntegerField(blank=True, null=True)
-    target_direction = models.CharField(max_length=16, blank=True, null=True)
-
-
-    class Meta:
-        db_table = 'event'
-        constraints = [
-            models.UniqueConstraint(
-                fields=['event_date', 'drill'], name='unique_drill_event_date'
-            )
-        ]
-
-    def __str__(self):
-        return f'{self.event_date}' 
     
