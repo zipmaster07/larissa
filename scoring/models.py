@@ -4,7 +4,7 @@ Classes:
     Drill -- Stores details about the drill.
     FirearmType -- A list of different firearm types.
     Firearm -- Details about a firearm.
-    History -- Stores the overall history.
+    Event -- Stores the overall event history.
     Score -- Stores each drill attempt and its score.
     Skill - A list of shooting skills.
     Shooter -- Details about an individual.
@@ -83,7 +83,7 @@ class TargetType(models.Model):
 class FirearmType(models.Model):
     """A list of firearm types.
 
-    This object includes firearm types to easily identify a score based on
+    This object includes firearm types to easily identiftarget_type'y a score based on
     type.
     """
 
@@ -102,8 +102,8 @@ class Firearm(models.Model):
     to perform the drill.
     """
     
-    model = models.CharField(max_length=128, unique=True)
     make = models.CharField(max_length=128)
+    model = models.CharField(max_length=128, unique=True)
     type = models.ForeignKey(FirearmType, on_delete=models.PROTECT)
     caliber = models.CharField(max_length=64, blank=True)
     sight_type = models.CharField(max_length=64, blank=True, null=True)
@@ -132,11 +132,12 @@ class Drill(models.Model):
     """
 
     name = models.CharField(max_length=64, unique=True)
-    description = models.TextField()
-    targets = models.ManyToManyField(TargetType)
     skills = models.ManyToManyField(Skill)
-    scoring_description = models.TextField()
+    targets = models.ManyToManyField(TargetType)
+    scored = models.BooleanField(blank=True, null=True)
     notes = models.TextField(blank=True)
+    description = models.TextField()
+    scoring_description = models.TextField()
 
     class Meta:
         db_table = 'drill'
@@ -156,7 +157,7 @@ class String(models.Model):
     """
 
     drill = models.ForeignKey(Drill, on_delete=models.PROTECT)
-    seqno = models.IntegerField(default=1)
+    seqno = models.SmallIntegerField(default=1)
     live_round_count = models.PositiveIntegerField(default=0)
     dummy_round_count = models.PositiveIntegerField(default=0)
     instructions = models.TextField()
@@ -228,8 +229,8 @@ class StringDistance(models.Model):
     ]
 
     string = models.ForeignKey(String, on_delete=models.PROTECT)
-    starting_distance = models.PositiveIntegerField(blank=True)
-    ending_distance = models.PositiveIntegerField(blank=True, null=True)
+    start_distance = models.PositiveIntegerField(blank=True)
+    end_distance = models.PositiveIntegerField(blank=True, null=True)
     distance_type = models.PositiveSmallIntegerField(
         choices=DISTANCE_TYPES, blank=True, default=0
     )
@@ -238,7 +239,7 @@ class StringDistance(models.Model):
         db_table = 'drill_string_distance'
         constraints = [
             models.UniqueConstraint(
-                fields=['string', 'starting_distance', 'distance_type'],
+                fields=['string', 'start_distance', 'distance_type'],
                 name='unique_string_distance'
             )
         ]
@@ -253,14 +254,59 @@ class Shooter(models.Model):
     improve their skills.
     """
 
+    STRONG_HAND_OPTIONS = {
+        'Right': 'Right',
+        'Left': 'Left'
+    }
+
     first_name = models.CharField(max_length=255)
     last_name = models.CharField(max_length=255, blank=True)
+    birth_date = models.DateField(blank=True, null=True)
+    strong_hand = models.CharField(max_length=5, blank=True, null=True)
 
     class Meta:
         db_table = 'shooter'
 
+        constraints = [
+            models.CheckConstraint(
+                check=(Q(strong_hand='Left') | Q(strong_hand='Right')),
+                name='check_strong_hand'
+            )
+        ]
+
     def __str__(self):
         return f'{self.first_name} {self.last_name}' if self.last_name else f'{self.first_name}'
+
+class Event(models.Model):
+    """A history of shooting events.
+
+    Stores the date of each shooting event and the drills that were performed
+    at that event. Temperature should be reported in Fahrenheit.
+    """
+
+    STATES = {
+        'CA': 'California',
+        'CO': 'Colorado',
+        'NV': 'Nevada',
+        'UT': 'Utah'
+    }
+
+    RANGE_TYPES = {
+        0: 'Indoor',
+        1: 'Outdoor',
+        2: 'Hybrid'
+    }
+
+    event_date = models.DateField(default=date.today)
+    city = models.CharField(max_length=128, blank=True, null=True)
+    state = models.CharField(max_length=2, choices=STATES, blank=True, null=True)
+    zipcode = models.CharField(max_length=5, blank=True, null=True)
+    range_type = models.SmallIntegerField(choices=RANGE_TYPES, default=1)
+    temperature = models.SmallIntegerField(blank=True, null=True)
+    target_direction = models.CharField(max_length=16, blank=True, null=True)
+
+    def __str__(self):
+        return f'{self.event_date}' 
 
 class Score(models.Model):
     """Stores each attempt of a drill.
@@ -271,29 +317,39 @@ class Score(models.Model):
     proficiency or a baseline of how well the shooter does for a particular
     drill.
     """
+
+    DRAW_TYPE = {
+        'Low-Ready': 'Low-Ready',
+        'High-Ready': 'High-Ready',
+        'Concealed': 'Concealed',
+        'OWB': 'OWB'
+    }
     
     drill = models.ForeignKey(Drill, on_delete=models.PROTECT)
     string = models.ForeignKey(String, on_delete=models.PROTECT)
     shooter = models.ForeignKey(Shooter, on_delete=models.PROTECT)
     firearm = models.ForeignKey(Firearm, on_delete=models.PROTECT)
-    event_date = models.DateField(default=date.today)
-    score_time = models.PositiveIntegerField(blank=True, null=True)
-    generic_hits = models.PositiveIntegerField(blank=True, null=True)
-    zone_hits_1 = models.PositiveIntegerField(blank=True, null=True)
-    zone_hits_2 = models.PositiveIntegerField(blank=True, null=True)
-    zone_hits_3 = models.PositiveIntegerField(blank=True, null=True)
-    zone_hits_4 = models.PositiveIntegerField(blank=True, null=True)
-    zone_hits_5 = models.PositiveIntegerField(blank=True, null=True)
-    zone_hits_6 = models.PositiveIntegerField(blank=True, null=True)
-    zone_hits_7 = models.PositiveIntegerField(blank=True, null=True)
-    zone_hits_8 = models.PositiveIntegerField(blank=True, null=True)
-    zone_hits_9 = models.PositiveIntegerField(blank=True, null=True)
-    zone_hits_10 = models.PositiveIntegerField(blank=True, null=True)
-    mikes = models.PositiveIntegerField(blank=True, null=True)
-    points = models.PositiveIntegerField(blank=True, null=True)
-    penalties = models.PositiveIntegerField(blank=True, null=True)
-    from_concealment = models.BooleanField(blank=True, null=True)
-    distance = models.PositiveIntegerField(blank=True, null=True)
+    event = models.ForeignKey(Event, on_delete=models.PROTECT)
+    ttfs = models.DecimalField(max_digits=4, decimal_places=2, blank=True, null=True)
+    intermediary_time = models.DecimalField(max_digits=4, decimal_places=2, blank=True, null=True)
+    total_time = models.DecimalField(max_digits=5, decimal_places=2, blank=True, null=True)
+    generic_hits = models.SmallIntegerField(blank=True, null=True)
+    zone_hits_1 = models.SmallIntegerField(blank=True, null=True)
+    zone_hits_2 = models.SmallIntegerField(blank=True, null=True)
+    zone_hits_3 = models.SmallIntegerField(blank=True, null=True)
+    zone_hits_4 = models.SmallIntegerField(blank=True, null=True)
+    zone_hits_5 = models.SmallIntegerField(blank=True, null=True)
+    zone_hits_6 = models.SmallIntegerField(blank=True, null=True)
+    zone_hits_7 = models.SmallIntegerField(blank=True, null=True)
+    zone_hits_8 = models.SmallIntegerField(blank=True, null=True)
+    zone_hits_9 = models.SmallIntegerField(blank=True, null=True)
+    zone_hits_10 = models.SmallIntegerField(blank=True, null=True)
+    mikes = models.SmallIntegerField(blank=True, null=True)
+    pass_fail = models.BooleanField(blank=True, null=True)
+    time_penalty = models.DecimalField(max_digits=4, decimal_places=2, blank=True, null=True)
+    point_penalty = models.SmallIntegerField(blank=True, null=True)
+    draw = models.CharField(max_length=11, blank=True, null=True, choices=DRAW_TYPE)
+    distance = models.SmallIntegerField(blank=True, null=True)
     headshot = models.BooleanField(blank=True, null=True)
     notes = models.TextField(blank=True)
 
@@ -302,26 +358,4 @@ class Score(models.Model):
 
     def __str__(self):
         return str(self.id)
-
-class History(models.Model):
-    """A history of shooting events.
-
-    Stores the date of each shooting event and the drills that were performed
-    at that event.
-    """
-
-    event_date = models.DateField(default=date.today)
-    drill = models.ForeignKey(Drill, on_delete=models.PROTECT)
-    count = models.PositiveIntegerField(default=1)
-    location = models.CharField(max_length=255)
-
-    class Meta:
-        db_table = 'history'
-        constraints = [
-            models.UniqueConstraint(
-                fields=['event_date', 'drill'], name='unique_drill_event_date'
-            )
-        ]
-
-    def __str__(self):
-        return f'{self.event_date}: {self.drill.name}'
+    

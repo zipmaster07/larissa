@@ -5,5 +5,6 @@ from .views import DrillView
 
 app_name = 'scoring'
 urlpatterns = [
-    path('', views.DrillView.as_view(), name='drills')
+    path('', views.IndexView.as_view(), name='home'),
+    path('drills/', views.DrillView.as_view(), name='drills'),
 ]
