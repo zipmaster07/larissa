@@ -1,8 +1,12 @@
-<!doctype html>
-<html>
-<head>
-</head>
-<body>
-    
-</body>
-</html>
+{% extends "scoring/base.html" %}
+{% block body_block %}
+<h1>A List of Drills</h1>
+<div class="container">
+    <ol>
+    {% for drill in drills %}
+        <h3><li>{{drill.name}}</li></h3>
+    {% endfor %}
+        <h3><li>Some drill.</li></h3>
+    </ol>
+</div>
+{% endblock %}
