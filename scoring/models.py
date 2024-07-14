@@ -80,18 +80,52 @@ class TargetType(models.Model):
     def __str__(self):
         return self.name
 
+class FirearmDetails(models.Model):
+    """Configurable details of firearms.
+
+    This object includes firearm specific capacity, sighting, and suppression.
+    """
+
+    SIGHTS = [
+        (0, 'Irons'),
+        (1, 'Red Dot'),
+        (2, 'Holographic'),
+        (3, 'ACOG'),
+        (4, 'LPVO'),
+        (5, 'Rifle Scope'),
+        (9, 'Other'),
+    ]
+
+    sight_type = models.PositiveSmallIntegerField(choices=SIGHTS, blank=True, default=0)
+    suppressed = models.BooleanField(blank=True, null=True)
+    magazine_capacity = models.PositiveSmallIntegerField(blank=True, null=True)
+
+    class Meta:
+        db_table = 'firearm_details'
+    
+    def __str__(self):
+        return self.id
+
 class FirearmType(models.Model):
     """A list of firearm types.
 
-    This object includes firearm types to easily identiftarget_type'y a score based on
-    type.
+    This object includes firearm type to easily identify target types and
+    a score based on a type.
     """
 
-    type = models.CharField(max_length=64, unique=True)
+    FIREARM_TYPE = [
+        (0, 'Pistol'),
+        (1, 'Rifle'),
+        (2, 'Shotgun'),
+        (3, 'Revolver'),
+        (9, 'Other'),
+    ]
+
+    type = models.PositiveSmallIntegerField(choices=FIREARM_TYPE)
 
     class Meta:
         db_table = 'firearm_type'
-    
+
     def __str__(self):
         return self.type
 
@@ -101,14 +135,24 @@ class Firearm(models.Model):
     A simple object that stores the name of firearms that the shooter can use
     to perform the drill.
     """
-    
-    make = models.CharField(max_length=128)
-    model = models.CharField(max_length=128, unique=True)
+
+    ACTION = [
+        (0, 'Striker'),
+        (1, 'Single-Action'),
+        (2, 'Double-Action Only'),
+        (3, 'Double-Action/Single-Action'),
+        (4, 'Bolt'),
+        (9, 'Other'),
+    ]
+
     type = models.ForeignKey(FirearmType, on_delete=models.PROTECT)
+    firearm_details = models.ForeignKey(FirearmDetails, on_delete=models.PROTECT)
+    manufacturer = models.CharField(max_length=128)
+    model = models.CharField(max_length=128, unique=True)
     caliber = models.CharField(max_length=64, blank=True)
-    sight_type = models.CharField(max_length=64, blank=True, null=True)
     barrel_length = models.IntegerField(blank=True, null=True)
-    suppressed = models.BooleanField(blank=True, null=True)
+    trigger_action = models.PositiveSmallIntegerField(choices=ACTION, blank=True, null=True)
+
 
     class Meta:
         db_table = 'firearm'
@@ -145,7 +189,7 @@ class Drill(models.Model):
     def __str__(self):
         return self.name
 
-class String(models.Model):
+class DrillString(models.Model):
     """A specific event or set of events that is part of a drill.
 
     A string is an individual component of a drill. Some drills have multiple
@@ -173,14 +217,14 @@ class String(models.Model):
     def __str__(self):
         return f'{self.drill.name} string #{self.seqno}'
 
-class StringParTime(models.Model):
+class DrillStringPar(models.Model):
     """A list of par times for a particular drill string.
 
     Drill strings can have different par times for the same string or for
     various levels of proficiency.
     """
 
-    string = models.ForeignKey(String, on_delete=models.PROTECT)
+    string = models.ForeignKey(DrillString, on_delete=models.PROTECT)
     par = models.DecimalField(
         max_digits=4, decimal_places=1, blank=True, null=True
     )
@@ -216,7 +260,7 @@ class StringParTime(models.Model):
     def __str__(self):
         return f'{self.string.drill.name} string #{self.string.seqno} par time: {self.par}'
 
-class StringDistance(models.Model):
+class DrillStringDistance(models.Model):
     """The distance for a particular drill string.
 
     Drill strings can have different distances for the same string.
@@ -228,7 +272,7 @@ class StringDistance(models.Model):
         (2, 'Meters'),
     ]
 
-    string = models.ForeignKey(String, on_delete=models.PROTECT)
+    string = models.ForeignKey(DrillString, on_delete=models.PROTECT)
     start_distance = models.PositiveIntegerField(blank=True)
     end_distance = models.PositiveIntegerField(blank=True, null=True)
     distance_type = models.PositiveSmallIntegerField(
@@ -245,7 +289,7 @@ class StringDistance(models.Model):
         ]
     
     def __str__(self):
-        return f'{self.string.drill.name} string #{self.string.seqno} distance: {self.starting_distance}'
+        return f'{self.string.drill.name} string #{self.string.seqno} distance: {self.start_distance}'
 
 class Shooter(models.Model):
     """The details of the shooter performing a drill.
@@ -326,7 +370,7 @@ class Score(models.Model):
     }
     
     drill = models.ForeignKey(Drill, on_delete=models.PROTECT)
-    string = models.ForeignKey(String, on_delete=models.PROTECT)
+    string = models.ForeignKey(DrillString, on_delete=models.PROTECT)
     shooter = models.ForeignKey(Shooter, on_delete=models.PROTECT)
     firearm = models.ForeignKey(Firearm, on_delete=models.PROTECT)
     event = models.ForeignKey(Event, on_delete=models.PROTECT)
