@@ -1,21 +1,22 @@
 """Models for the firearm scoring app.
 
 Classes:
+    DrillStringPar -- The par times of a string.
+    DrillStringDistance -- The distances of a string.
+    DrillString -- An individual string of a drill.
     Drill -- Stores details about the drill.
+    FirearmDetails -- A collection of details about an individual firearm.
     FirearmType -- A list of different firearm types.
-    Firearm -- Details about a firearm.
+    Firearm -- Generic information about a firearm.
     Event -- Stores the overall event history.
     Score -- Stores each drill attempt and its score.
     Skill - A list of shooting skills.
     Shooter -- Details about an individual.
-    String -- An individual string of a drill.
-    StringParTime -- The par times of a string.
-    StringDistance -- The distances of a string.
     TargetType -- Stores details about the different types of targets.
 """
 
-__author__ = ['Joshua Schaeffer']
-__version__ = '0.1.0'
+__author__ = ['Joshua Schaeffer', 'Daniel Schaeffer']
+__version__ = '0.2.0'
 __py_version__ = '3.10.6'
 __creation_date__ = '2023-07-30'
 
