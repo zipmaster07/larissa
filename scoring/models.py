@@ -114,17 +114,29 @@ class FirearmType(models.Model):
     """
 
     FIREARM_TYPE = [
-        (0, 'Pistol'),
-        (1, 'Rifle'),
-        (2, 'Shotgun'),
-        (3, 'Revolver'),
-        (9, 'Other'),
+        ('Pistol', 'Pistol'),
+        ('Rifle', 'Rifle'),
+        ('Shotgun', 'Shotgun'),
+        ('Revolver', 'Revolver'),
+        ('Other', 'Other'),
     ]
 
-    type = models.PositiveSmallIntegerField(choices=FIREARM_TYPE)
+    type = models.CharField(max_length=64, choices=FIREARM_TYPE)
 
     class Meta:
         db_table = 'firearm_type'
+        # constraints = [
+        #     models.CheckConstraint(
+        #         check=(
+        #             Q(type='Pistol') |
+        #             Q(type='Rifle') |
+        #             Q(type='Shotgun') |
+        #             Q(type='Revolver') |
+        #             Q(type='Other')
+        #         ),
+        #         name='check_firearm_type'
+        #     )
+        # ]
 
     def __str__(self):
         return self.type
@@ -148,14 +160,20 @@ class Firearm(models.Model):
     type = models.ForeignKey(FirearmType, on_delete=models.PROTECT)
     firearm_details = models.ForeignKey(FirearmDetails, on_delete=models.PROTECT)
     manufacturer = models.CharField(max_length=128)
-    model = models.CharField(max_length=128, unique=True)
-    caliber = models.CharField(max_length=64, blank=True)
-    barrel_length = models.IntegerField(blank=True, null=True)
+    model = models.CharField(max_length=128)
+    caliber = models.CharField(max_length=64)
+    barrel_length = models.DecimalField(max_digits=4, decimal_places=2)
     trigger_action = models.PositiveSmallIntegerField(choices=ACTION, blank=True, null=True)
 
 
     class Meta:
         db_table = 'firearm'
+        constraint = [
+            models.UniqueConstraint(
+                fields=['manufacturer', 'model', 'caliber', 'barrel_length'],
+                name='unique_manufacturer_model_caliber_barrel_length'
+            ),
+        ]
 
     def __str__(self):
         return f'{self.manufacturer} {self.model}'
