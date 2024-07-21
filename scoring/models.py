@@ -1,21 +1,22 @@
 """Models for the firearm scoring app.
 
 Classes:
+    DrillStringPar -- The par times of a string.
+    DrillStringDistance -- The distances of a string.
+    DrillString -- An individual string of a drill.
     Drill -- Stores details about the drill.
+    FirearmDetails -- A collection of details about an individual firearm.
     FirearmType -- A list of different firearm types.
-    Firearm -- Details about a firearm.
+    Firearm -- Generic information about a firearm.
     Event -- Stores the overall event history.
     Score -- Stores each drill attempt and its score.
     Skill - A list of shooting skills.
     Shooter -- Details about an individual.
-    String -- An individual string of a drill.
-    StringParTime -- The par times of a string.
-    StringDistance -- The distances of a string.
     TargetType -- Stores details about the different types of targets.
 """
 
-__author__ = ['Joshua Schaeffer']
-__version__ = '0.1.0'
+__author__ = ['Joshua Schaeffer', 'Daniel Schaeffer']
+__version__ = '0.2.0'
 __py_version__ = '3.10.6'
 __creation_date__ = '2023-07-30'
 
@@ -80,6 +81,22 @@ class TargetType(models.Model):
     def __str__(self):
         return self.name
 
+class Caliber(models.Model):
+    """A list of calibers that firearms can use.
+
+    This object stores all the different calibers that all firearms could use.
+    """
+
+    short_name = models.CharField(max_length=64)
+    full_name = models.CharField(max_length=128)
+    description = models.TextField(blank=True, null=True)
+
+    class Meta:
+        db_table = 'caliber'
+
+    def __str__(self):
+        return self.short_name
+
 class FirearmDetails(models.Model):
     """Configurable details of firearms.
 
@@ -109,8 +126,8 @@ class FirearmDetails(models.Model):
 class FirearmType(models.Model):
     """A list of firearm types.
 
-    This object includes firearm type to easily identify target types and
-    a score based on a type.
+    This object describes a generic type of a firearm to easily identify target
+    types and a score based on a type.
     """
 
     FIREARM_TYPE = [
@@ -121,22 +138,10 @@ class FirearmType(models.Model):
         ('Other', 'Other'),
     ]
 
-    type = models.CharField(max_length=64, choices=FIREARM_TYPE)
+    type = models.PositiveSmallIntegerField(choices=FIREARM_TYPE)
 
     class Meta:
         db_table = 'firearm_type'
-        # constraints = [
-        #     models.CheckConstraint(
-        #         check=(
-        #             Q(type='Pistol') |
-        #             Q(type='Rifle') |
-        #             Q(type='Shotgun') |
-        #             Q(type='Revolver') |
-        #             Q(type='Other')
-        #         ),
-        #         name='check_firearm_type'
-        #     )
-        # ]
 
     def __str__(self):
         return self.type
@@ -144,8 +149,8 @@ class FirearmType(models.Model):
 class Firearm(models.Model):
     """The firearm used by the shooter to perform a drill.
     
-    A simple object that stores the name of firearms that the shooter can use
-    to perform the drill.
+    An object that stores the name of the firearm as well as some of its
+    permanent details that the shooter can use to perform the drill.
     """
 
     ACTION = [
@@ -158,11 +163,11 @@ class Firearm(models.Model):
     ]
 
     type = models.ForeignKey(FirearmType, on_delete=models.PROTECT)
+    caliber = models.ForeignKey(Caliber, on_delete=models.PROTECT)
     firearm_details = models.ForeignKey(FirearmDetails, on_delete=models.PROTECT)
     manufacturer = models.CharField(max_length=128)
-    model = models.CharField(max_length=128)
-    caliber = models.CharField(max_length=64)
-    barrel_length = models.DecimalField(max_digits=4, decimal_places=2)
+    model = models.CharField(max_length=128, unique=True)
+    barrel_length = models.IntegerField(blank=True, null=True)
     trigger_action = models.PositiveSmallIntegerField(choices=ACTION, blank=True, null=True)
 
 
