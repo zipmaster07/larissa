@@ -37,6 +37,8 @@ skills = [
     ('grip', ''),
     ('cadence', ''),
     ('fitness', 'The level of physical fitness an individual has and how well a shooter can perform while physically fatigued.'),
+    ('weapons manipulation', ''),
+    ('kit shakeout', ''),
 ]
 
 for skill in skills:

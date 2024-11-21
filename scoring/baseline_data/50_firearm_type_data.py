@@ -17,7 +17,7 @@ from scoring.models import FirearmType
 count = 0
 added = 0
 print('ADDING FIREARM TYPES TO DATABASE...')
-firearm_types = ['Sidearm', 'Long gun',]
+firearm_types = ['Pistol', 'Rifle', 'Shotgun', 'Revolver', 'Other']
 
 for firearm_type in firearm_types:
     count += 1

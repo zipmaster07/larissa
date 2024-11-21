@@ -1359,6 +1359,16 @@ targets = [
         'picture': 'target_images/IDPA_P.jpg',
     },
     {
+        'name': 'IDPA',
+        'description': 'Official International Defensive Pistol Association cardboard practice target.',
+        'version': 'Steel',
+        'color': 0,
+        'target_url_1': '',
+        'target_url_2': '',
+        'target_url_3': '',
+        'picture': 'target_images/IDPA_S.jpg',
+    },
+    {
         'name': 'INDEX-CIT',
         'description': 'Hostile man with head, center mass, pelvic area scoring to include vital organs and spinal column.',
         'version': '',
@@ -1387,6 +1397,16 @@ targets = [
         'target_url_2': 'https://shop.actiontarget.com/content/ipsc-p-ipsc-uspsa-paper-target.asp',
         'target_url_3': '',
         'picture': 'target_images/IPSC_P.jpg',
+    },
+    {
+        'name': 'IPSC',
+        'description': 'Official International Practice Shooting Confederation paper practice target.',
+        'version': 'Steel',
+        'color': 0,
+        'target_url_1': '',
+        'target_url_2': '',
+        'target_url_3': '',
+        'picture': 'target_images/IPSC_S.jpg',
     },
     {
         'name': 'JDC DOMINO',
@@ -2477,6 +2497,16 @@ targets = [
         'target_url_2': '',
         'target_url_3': '',
         'picture': 'target_images/T1C-ColdStart.png',
+    },
+    {
+        'name': 'Runenation Cold Start',
+        'description': 'Runenation cold start drill',
+        'version': '',
+        'color': 0,
+        'target_url_1': '',
+        'target_url_2': '',
+        'target_url_3': '',
+        'picture': 'target_images/Runenation.png',
     },
 ]
 

@@ -23,6 +23,7 @@ shooters = [
     ('Daniel', 'Schaeffer'),
     ('Paul', 'Schaeffer'),
     ('Chad', 'Krupa'),
+    ('Robert', 'Krupa'),
     ('Jaymes', 'Mosher'),
 ]
 

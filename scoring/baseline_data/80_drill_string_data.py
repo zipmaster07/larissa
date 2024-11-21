@@ -12,7 +12,7 @@ import django
 django.setup()
 
 from django.db.utils import IntegrityError
-from scoring.models import Drill, String
+from scoring.models import Drill, DrillString
 
 count = 0
 added = 0
@@ -21,16 +21,23 @@ print('ADDING DRILL STRINGS TO DATABASE...')
 _2x2x2 = Drill.objects.get(name='2x2x2')
 _3M = Drill.objects.get(name='3M')
 _5x5 = Drill.objects.get(name='5x5')
+_9hole = Drill.objects.get(name='9-Hole')
+active_shooter = Drill.objects.get(name='Active Shooter')
 bill_drill = Drill.objects.get(name='Bill Drill')
+bright_light = Drill.objects.get(name='Bright Light')
 cadence_drill = Drill.objects.get(name='Cadence Drill')
 casino = Drill.objects.get(name='Casino')
+check_down = Drill.objects.get(name='Check Down')
 cold_start = Drill.objects.get(name='Cold Start')
+collateral = Drill.objects.get(name='Collateral')
+cornucopia = Drill.objects.get(name='Cornucopia')
 dot_torture = Drill.objects.get(name='Dot Torture')
 el_presidente = Drill.objects.get(name='El Presidente')
 fbi_qual = Drill.objects.get(name='FBI Qualification')
 first_shot = Drill.objects.get(name='First Shot')
 five_yard_roundup = Drill.objects.get(name='Five-yard Roundup')
-mr_toads_drill = Drill.objects.get(name="Mr. Toad's Drill")
+mozambique = Drill.objects.get(name='Mozambique')
+runenation = Drill.objects.get(name='Runenation')
 super_test = Drill.objects.get(name='Super Test')
 the_burger_drill = Drill.objects.get(name='The Burger Drill')
 throttle_control = Drill.objects.get(name='Throttle Control')
@@ -57,10 +64,28 @@ drill_strings = [
         'instructions': 'Shoot one group with no time limit to confirm zero. Starting from a low ready position, repeat 5 more times with the 5 second time limit in place.\n\nVariations: For an added challenge, draw from the holster instead of low ready. To test consistency, repeat the drill five times.'
     },
     {
+        'drill': _9hole,
+        'seqno': 1,
+        'live_round_count': 9,
+        'instructions': 'Stand behind the target with the rifle in low or high ready touching the end of the barrel to the barricade. On the buzzer and starting with the top opening in the barricade fire one shot through each opening working your way down to the bottom. If a steel target is used then only move onto the next opening if a hit occurs. If using a paper target fire 9 shots only (one for each opening).'
+    },
+    {
+        'drill': active_shooter,
+        'seqno': 1,
+        'live_round_count': 5,
+        'instructions': 'Starting 40 yards away from the 10 yard line with the duffle bag at the shooter’s feet, on the buzzer pick up the duffle bag and run as fast as possible to the 10 yard line. The shooter does not have to start 40 yards away from the target itself, but can choose to start anywhere on the field as long as they run a total of 30 yards. They may choose to run away from, towards, or in parallel to the target itself. Once at the 10 yard line the shooter should drop the bag behind a barricade then draw while kneeling and fire five shots. Ideally the barricade should allow shots from a kneeling position, but if not, the shooter can choose to shoot around the barricade.'
+    },
+    {
         'drill': bill_drill,
         'seqno': 1,
         'live_round_count': 6,
         'instructions': 'Draw from low ready or conceal, fire six rounds.'
+    },
+    {
+        'drill': bright_light,
+        'seqno': 1,
+        'live_round_count': 5,
+        'instructions': 'The shooter should start at the 5 yard line with their back to the two target stands, their sidearm holstered, and a flashlight (turned off) in their support hand. On the buzzer turn around and positively identify both targets by shining the flashlight on both of them (one will be blank). After identifying the targets, draw, and fire five rounds strong hand only.'
     },
     {
         'drill': cadence_drill,
@@ -75,10 +100,70 @@ drill_strings = [
         'instructions': 'From the holster, start with 7 rounds loaded in the pistol and two 7 round spare magazines. At the starting buzzer, draw and engage each shape in numerical order starting from 1 up to 6. Fire the number of rounds at each shape equal to the number displayed on that shape. Reload as needed.'
     },
     {
+        'drill': check_down,
+        'seqno': 1,
+        'live_round_count': 3,
+        'instructions': 'With an empty mag and one round in the chamber (to induce bolt lock), start from low/high ready on the buzzer. On bolt lock, transition from rifle to pistol firing one shot. After the one pistol shot and while still holding your pistol in your strong hand, bring your rifle up to check for any malfunctions, empty mag, etc. Re-holster pistol and perform a reload with your rifle taking one final shot (this last shot is primarily to stop the clock and allows you to measure time intervals and total time).'
+    },
+    {
         'drill': cold_start,
         'seqno': 1,
         'live_round_count': 10,
         'instructions': 'Start with 2 rounds in the magazine (chamber a round) and 8 rounds in a spare magazine.\n\nStarting at 10 yards, on the buzzer, draw from concealment and place 1 round in each of the top 3” x 3” boxes. Then, on the move, perform a slide lock reload and place 6 rounds in the T1C logo area by the time you reach the 3 yard line. Once at the 3 yard line, place 1 round in each of the small triangles, using only your right hand and left hand, respectively.'
+    },
+    {
+        'drill': collateral,
+        'seqno': 1,
+        'live_round_count': 5,
+        'instructions': 'Starting with your hands raised, on the buzzer the shooter will draw and fire two shots at the first target from the hip using their strong hand only. It is up to the shooter which target they shoot first. After the first two shots the shooter will then shoot the remaining three shots at the other target with both hands on the firearm.'
+    },
+    {
+        'drill': cornucopia,
+        'seqno': 1,
+        'live_round_count': 2,
+        'instructions': 'From compressed ready, 2 to left target head box.'
+    },
+    {
+        'drill': cornucopia,
+        'seqno': 2,
+        'live_round_count': 2,
+        'instructions': '2 to center target head box.'
+    },
+    {
+        'drill': cornucopia,
+        'seqno': 3,
+        'live_round_count': 2,
+        'instructions': '2 to right target head box, one handed.'
+    },
+    {
+        'drill': cornucopia,
+        'seqno': 4,
+        'live_round_count': 10,
+        'instructions': 'Engage center target 1 round, left target 2 rounds, right target 3 rounds, back to center target 4 rounds.'
+    },
+    {
+        'drill': cornucopia,
+        'seqno': 5,
+        'live_round_count': 6,
+        'instructions': '180 degree turn, 3 rounds into left target, slide-lock reload, 3 rounds into right target.'
+    },
+    {
+        'drill': cornucopia,
+        'seqno': 6,
+        'live_round_count': 4,
+        'instructions': '2 rounds into left target, move to 20 yard line, 2 rounds into right target (or vice versa).'
+    },
+    {
+        'drill': cornucopia,
+        'seqno': 7,
+        'live_round_count': 12,
+        'instructions': 'From left/right position, engage 2 on each target, move to next position while reloading, 2 on each target again.'
+    },
+    {
+        'drill': cornucopia,
+        'seqno': 8,
+        'live_round_count': 12,
+        'instructions': 'While moving towards 5 yard line, 4 rounds into each target in any order'
     },
     {
         'drill': dot_torture,
@@ -207,52 +292,16 @@ drill_strings = [
         'instructions': 'From low ready using support hand only, fire 2 rounds.'
     },
     {
-        'drill': mr_toads_drill,
+        'drill': mozambique,
         'seqno': 1,
-        'live_round_count': 2,
-        'instructions': 'From compressed ready, 2 to left target head box.'
+        'live_round_count': 3,
+        'instructions': 'You can fire this drill from various distances, with 7-yards serving as a great starting point. Shooters begin the drill at the low ready or with the firearm holstered, depending on skill level. Traditionally it’s fired from a holstered situation, but it’s not required. For rifles, start the drill from low ready. On the buzzer fire the first two shots to the body A zone and the third shot to the headshot A zone.'
     },
     {
-        'drill': mr_toads_drill,
-        'seqno': 2,
-        'live_round_count': 2,
-        'instructions': '2 to center target head box.'
-    },
-    {
-        'drill': mr_toads_drill,
-        'seqno': 3,
-        'live_round_count': 2,
-        'instructions': '2 to right target head box, one handed.'
-    },
-    {
-        'drill': mr_toads_drill,
-        'seqno': 4,
-        'live_round_count': 10,
-        'instructions': 'Engage center target 1 round, left target 2 rounds, right target 3 rounds, back to center target 4 rounds.'
-    },
-    {
-        'drill': mr_toads_drill,
-        'seqno': 5,
-        'live_round_count': 6,
-        'instructions': '180 degree turn, 3 rounds into left target, slide-lock reload, 3 rounds into right target.'
-    },
-    {
-        'drill': mr_toads_drill,
-        'seqno': 6,
-        'live_round_count': 4,
-        'instructions': '2 rounds into left target, move to 20 yard line, 2 rounds into right target (or vice versa).'
-    },
-    {
-        'drill': mr_toads_drill,
-        'seqno': 7,
-        'live_round_count': 12,
-        'instructions': 'From left/right position, engage 2 on each target, move to next position while reloading, 2 on each target again.'
-    },
-    {
-        'drill': mr_toads_drill,
-        'seqno': 8,
-        'live_round_count': 12,
-        'instructions': 'While moving towards 5 yard line, 4 rounds into each target in any order'
+        'drill': runenation,
+        'seqno': 1,
+        'live_round_count': 16,
+        'instructions': 'For pistols, start from the holster. For rifles start from low/high ready. On the buzzer, draw/mount & fire 1 round into any low probability target (small circle, square, diamond, or triangle) followed by three shots into the high probability logo target. Repeat the sequence 4 times, engaging a different low probability target each time. Take makeup shots as necessary.'
     },
     {
         'drill': super_test,
@@ -312,7 +361,7 @@ drill_strings = [
 
 for drill_string in drill_strings:
     count += 1
-    s = String(**drill_string)
+    s = DrillString(**drill_string)
     try:
         print(f"{count}: Adding '{s}' to database.")
         s.save()
