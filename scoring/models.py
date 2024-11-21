@@ -1,6 +1,7 @@
 """Models for the firearm scoring app.
 
 Classes:
+    Caliber -- Stores a list of calibers.
     DrillStringPar -- The par times of a string.
     DrillStringDistance -- The distances of a string.
     DrillString -- An individual string of a drill.
@@ -93,6 +94,12 @@ class Caliber(models.Model):
 
     class Meta:
         db_table = 'caliber'
+        constraints = [
+            models.UniqueConstraint(
+                fields=['short_name'],
+                name='unique_short_name_caliber'
+            ),
+        ]
 
     def __str__(self):
         return self.short_name
@@ -119,9 +126,15 @@ class FirearmDetails(models.Model):
 
     class Meta:
         db_table = 'firearm_details'
+        constraints = [
+            models.UniqueConstraint(
+                fields=['sight_type', 'suppressed', 'magazine_capacity'],
+                name='unique_firearm_details'
+            ),
+        ]
     
     def __str__(self):
-        return self.id
+        return str(self.id)
 
 class FirearmType(models.Model):
     """A list of firearm types.
@@ -138,7 +151,7 @@ class FirearmType(models.Model):
         ('Other', 'Other'),
     ]
 
-    type = models.PositiveSmallIntegerField(choices=FIREARM_TYPE)
+    type = models.CharField(choices=FIREARM_TYPE)
 
     class Meta:
         db_table = 'firearm_type'
@@ -164,19 +177,19 @@ class Firearm(models.Model):
 
     type = models.ForeignKey(FirearmType, on_delete=models.PROTECT)
     caliber = models.ForeignKey(Caliber, on_delete=models.PROTECT)
-    firearm_details = models.ForeignKey(FirearmDetails, on_delete=models.PROTECT)
+    firearm_details = models.ForeignKey(FirearmDetails, on_delete=models.PROTECT, blank=True, null=True)
     manufacturer = models.CharField(max_length=128)
-    model = models.CharField(max_length=128, unique=True)
-    barrel_length = models.IntegerField(blank=True, null=True)
+    model = models.CharField(max_length=128)
+    barrel_length = models.DecimalField(max_digits=4, decimal_places=2, blank=True, null=True)
     trigger_action = models.PositiveSmallIntegerField(choices=ACTION, blank=True, null=True)
 
 
     class Meta:
         db_table = 'firearm'
-        constraint = [
+        constraints = [
             models.UniqueConstraint(
-                fields=['manufacturer', 'model', 'caliber', 'barrel_length'],
-                name='unique_manufacturer_model_caliber_barrel_length'
+                fields=['manufacturer', 'model', 'caliber', 'barrel_length', 'firearm_details'],
+                name='unique_manufacturer_model_caliber_barrel_length_firearm_details'
             ),
         ]
 
@@ -187,7 +200,7 @@ class Drill(models.Model):
     """Drill information.
 
     A drill is a shooting exercise which consists of one or more strings. The
-    details of the individual string are stored in the `String` object. All the
+    details of the individual string are stored in the `DrillString` object. All the
     strings of a drill constitue specific steps unique to each drill. In order
     to execute the drill, the shooter must perform all the steps of each string
     to the best of their ability. Drills are designed to teach a wide range of
@@ -298,9 +311,7 @@ class DrillStringDistance(models.Model):
     string = models.ForeignKey(DrillString, on_delete=models.PROTECT)
     start_distance = models.PositiveIntegerField(blank=True)
     end_distance = models.PositiveIntegerField(blank=True, null=True)
-    distance_type = models.PositiveSmallIntegerField(
-        choices=DISTANCE_TYPES, blank=True, default=0
-    )
+    distance_type = models.PositiveSmallIntegerField(choices=DISTANCE_TYPES, blank=True, default=0)
 
     class Meta:
         db_table = 'drill_string_distance'
